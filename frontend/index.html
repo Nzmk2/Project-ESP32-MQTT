@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IoT Sensor Live — 152023040_Nizar</title>
+    <style>
+        :root {
+            --bg: #0f1226;
+            --card: #15183a;
+            --muted: #9aa3b2;
+            --text: #e8ecf3;
+            --accent: #6c7cff;
+            --good: #2ecc71;
+            --warn: #f39c12;
+            --bad: #e74c3c;
+        }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(60vmax 60vmax at -10% -10%, #1b1e3f 0%, transparent 60%),
+                radial-gradient(60vmax 60vmax at 110% 0%, #2a2d5a 0%, transparent 60%),
+                radial-gradient(80vmax 80vmax at 50% 120%, #1a1d42 0%, transparent 60%),
+                var(--bg);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 760px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .brand h1 {
+            margin: 0;
+            font-size: clamp(20px, 2vw + 12px, 28px);
+            letter-spacing: 0.2px;
+            font-weight: 650;
+        }
+        .tag {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.0))
+                                    ,var(--card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+
+        .headline {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(108, 124, 255, 0.12);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .dot {
+            width: 8px; height: 8px; border-radius: 50%; background: currentColor;
+            box-shadow: 0 0 0 0 currentColor; animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%{ box-shadow: 0 0 0 0 currentColor;} 70%{box-shadow:0 0 0 8px rgba(0,0,0,0);} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0);} }
+
+        .reading {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            padding: 8px 0 4px;
+        }
+        .temp {
+            font-size: clamp(42px, 6vw + 12px, 68px);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .unit { color: var(--muted); font-weight: 500; font-size: 0.6em; margin-left: 6px; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .stat {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 12px;
+            display: grid;
+            gap: 4px;
+        }
+        .label { color: var(--muted); font-size: 12px; }
+        .value { font-size: 20px; font-weight: 650; }
+
+        .footer {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 6px;
+            color: var(--muted); font-size: 12px;
+        }
+
+            .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+            button, .ghost {
+            appearance: none; border: 0; cursor: pointer;
+            background: rgba(108,124,255,0.14);
+            color: var(--text);
+            border: 1px solid rgba(108,124,255,0.35);
+            padding: 8px 12px; border-radius: 10px; font-weight: 600; font-size: 13px;
+            transition: transform .05s ease, background .2s ease;
+        }
+        button:hover { background: rgba(108,124,255,0.22); }
+        button:active { transform: translateY(1px); }
+        .ghost { background: transparent; border-color: rgba(255,255,255,0.12); color: var(--muted); }
+
+            /* LED button state */
+            .led-on { background: rgba(46, 204, 113, 0.18); border-color: rgba(46,204,113,0.5); }
+            .led-on:hover { background: rgba(46, 204, 113, 0.26); }
+
+            /* Table styles */
+            table { width: 100%; border-collapse: collapse; }
+            thead th { text-align: left; padding: 10px 12px; font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: .2px; }
+            tbody td { padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 14px; }
+            tbody tr:hover { background: rgba(255,255,255,0.03); }
+    </style>
+</head>
+<body>
+    <main class="wrap">
+        <div class="brand">
+            <h1>IoT Sensor Live</h1>
+            <span class="tag">152023040_Nizar</span>
+        </div>
+
+        <section class="card">
+            <div class="headline">
+                <div class="status" id="status"><span class="dot"></span><span>Menunggu data…</span></div>
+                        <div class="controls">
+                            <button id="refresh">Muat ulang</button>
+                            <button id="ledToggle" class="ghost" aria-pressed="false">LED: Off</button>
+                            <button class="ghost" id="toggleAuto">Auto: On</button>
+                        </div>
+            </div>
+
+            <div class="reading">
+                <div class="temp"><span id="suhu">--</span><span class="unit">°C</span></div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="label">Kelembapan</div>
+                        <div class="value"><span id="humidity">--</span><span class="unit">%</span></div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Kecerahan</div>
+                        <div class="value"><span id="lux">--</span><span class="unit"> lux</span></div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">ID & Waktu</div>
+                        <div class="value" style="font-size:16px"><span id="id">-</span> · <span id="timestamp">-</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <span>Menampilkan data terbaru dari database</span>
+                <span id="ago">—</span>
+            </div>
+        </section>
+
+            <!-- Tabel 10 data terbaru -->
+            <section class="card">
+                <div class="headline" style="grid-template-columns: 1fr;">
+                    <h2 style="margin:0; font-size:18px">Riwayat (10 data terbaru)</h2>
+                </div>
+                <div style="overflow:auto">
+                    <table aria-label="Tabel 10 data terbaru">
+                        <thead>
+                            <tr>
+                                <th style="width:70px">ID</th>
+                                <th>Suhu (°C)</th>
+                                <th>Humidity (%)</th>
+                                <th>Kecerahan (lux)</th>
+                                <th>Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listBody">
+                            <tr><td colspan="5" style="color:var(--muted); padding:12px">Memuat…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+    </main>
+
+    <script>
+        // Endpoint untuk data terbaru
+        const API_URL = 'http://localhost:3000/api/sensors/latest';
+        const LIST_API = 'http://localhost:3000/api/sensors?limit=10';
+
+        const el = {
+            status: document.getElementById('status'),
+            suhu: document.getElementById('suhu'),
+            humidity: document.getElementById('humidity'),
+            lux: document.getElementById('lux'),
+            id: document.getElementById('id'),
+            timestamp: document.getElementById('timestamp'),
+            ago: document.getElementById('ago'),
+            refresh: document.getElementById('refresh'),
+                    toggleAuto: document.getElementById('toggleAuto'),
+                    ledToggle: document.getElementById('ledToggle'),
+                    listBody: document.getElementById('listBody'),
+        };
+
+        let auto = true;
+        let timer = null;
+                let ledOn = false; // UI state; tanpa feedback perangkat
+
+        function setStatus(kind, text) {
+            const colors = { online: 'var(--good)', warn: 'var(--warn)', offline: 'var(--bad)', accent: 'var(--accent)' };
+            el.status.style.color = colors[kind] || 'var(--accent)';
+            el.status.innerHTML = `<span class="dot"></span><span>${text}</span>`;
+        }
+
+        function formatNumber(n, digits = 1) {
+            if (n === null || n === undefined || Number.isNaN(n)) return '--';
+            return Number(n).toFixed(digits);
+        }
+
+        function timeAgo(ts) {
+            if (!ts) return '—';
+            const now = new Date();
+            const dt = new Date(ts.replace(' ', 'T'));
+            const diff = Math.max(0, now - dt);
+            const s = Math.floor(diff / 1000);
+            if (s < 60) return `${s}s lalu`;
+            const m = Math.floor(s / 60);
+            if (m < 60) return `${m}m lalu`;
+            const h = Math.floor(m / 60);
+            return `${h}j lalu`;
+        }
+
+        async function loadLatest() {
+            try {
+                setStatus('accent', 'Memuat…');
+                const response = await fetch(`${API_URL}?_=${Date.now()}`, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+
+                if (!data || Object.keys(data).length === 0) {
+                    setStatus('warn', 'Belum ada data');
+                    el.suhu.textContent = '--';
+                    el.humidity.textContent = '--';
+                    el.lux.textContent = '--';
+                    el.id.textContent = '-';
+                    el.timestamp.textContent = '-';
+                    el.ago.textContent = '—';
+                    return;
+                }
+
+                el.suhu.textContent = formatNumber(data.suhu);
+                el.humidity.textContent = formatNumber(data.humidity, 0);
+                el.lux.textContent = parseInt(data.lux ?? 0, 10);
+                el.id.textContent = data.id ?? '-';
+                el.timestamp.textContent = data.timestamp ?? '-';
+                el.ago.textContent = timeAgo(data.timestamp);
+                setStatus('online', 'Online');
+            } catch (err) {
+                console.error('Gagal memuat:', err);
+                setStatus('offline', 'Terputus — cek backend');
+            }
+        }
+
+                async function loadList() {
+                    try {
+                        const res = await fetch(`${LIST_API}&_=${Date.now()}`, { cache: 'no-store' });
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        const rows = await res.json();
+
+                        if (!Array.isArray(rows) || rows.length === 0) {
+                            el.listBody.innerHTML = '<tr><td colspan="5" style="color:var(--muted); padding:12px">Belum ada data</td></tr>';
+                            return;
+                        }
+
+                        el.listBody.innerHTML = rows.map(r => `
+                            <tr>
+                                <td>#${r.id}</td>
+                                <td>${formatNumber(r.suhu)}</td>
+                                <td>${formatNumber(r.humidity, 0)}</td>
+                                <td>${parseInt(r.lux ?? 0, 10)}</td>
+                                <td>${r.timestamp}</td>
+                            </tr>
+                        `).join('');
+                    } catch (e) {
+                        console.error('Gagal memuat list:', e);
+                    }
+                }
+
+                function updateLedUI() {
+                    el.ledToggle.classList.toggle('led-on', ledOn);
+                    el.ledToggle.textContent = `LED: ${ledOn ? 'On' : 'Off'}`;
+                    el.ledToggle.setAttribute('aria-pressed', String(ledOn));
+                }
+
+                async function toggleLED() {
+                    try {
+                        const next = !ledOn;
+                        // Optimistic UI: set pending style
+                        el.ledToggle.disabled = true;
+                        el.ledToggle.textContent = next ? 'LED: On…' : 'LED: Off…';
+
+                        const resp = await fetch('http://localhost:3000/api/led', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ state: next ? 'on' : 'off' })
+                        });
+
+                        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                        const out = await resp.json();
+                        // Jika sukses, commit UI state
+                        ledOn = out.state?.toLowerCase() === 'on';
+                        updateLedUI();
+                        setStatus('online', 'Online');
+                    } catch (err) {
+                        console.error('Gagal kirim perintah LED:', err);
+                        setStatus('warn', 'LED: gagal mengirim');
+                    } finally {
+                        el.ledToggle.disabled = false;
+                    }
+                }
+
+            function startAuto() {
+            clearInterval(timer);
+                if (auto) timer = setInterval(() => { loadLatest(); loadList(); }, 3000);
+            el.toggleAuto.textContent = `Auto: ${auto ? 'On' : 'Off'}`;
+        }
+
+        // Event bindings
+            el.refresh.addEventListener('click', () => { loadLatest(); loadList(); });
+        el.toggleAuto.addEventListener('click', () => { auto = !auto; startAuto(); });
+            el.ledToggle.addEventListener('click', toggleLED);
+
+        // Initial
+            loadLatest();
+            loadList();
+            updateLedUI();
+        startAuto();
+    </script>
+</body>
+</html>
