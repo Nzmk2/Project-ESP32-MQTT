@@ -30,6 +30,13 @@ Data sensor (suhu, humidity, cahaya) dikirim via MQTT, disimpan ke database, dan
 
 ---
 
+### Frontend:
+- **HTML5** - Structure
+- **CSS3** - Styling & Responsive Design
+- **JavaScript (Vanilla)** - Interactive Dashboard
+
+---
+
 ## 📊 Komponen Hardware (Simulasi)
 
 - ESP32 DevKit C V4
@@ -63,6 +70,9 @@ npm start
 - Buka https://wokwi.com/
 - Upload file dari folder `wokwi_config/`
 - Start simulation
+
+### 5. Buka Dashboard
+- Buka file `frontend/index.html` di browser
 
 
 ## 📡 API Endpoints
